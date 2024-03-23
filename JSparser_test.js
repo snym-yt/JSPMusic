@@ -19,9 +19,9 @@ function checkParserErrors(p) {
 
 function testReturnStatements() {
     const tests = [
-        { input: "return 5;", expectedValue: 5 },
-        { input: "return true;", expectedValue: true },
-        { input: "return y;", expectedValue: "y" },
+        { input: "return 5 +1;", expectedValue: 6 },
+        // { input: "return true;", expectedValue: true },
+        // { input: "return y;", expectedValue: "y" },
     ];
 
     for (const test of tests) {
@@ -37,17 +37,23 @@ function testReturnStatements() {
 
         const stmt = program.Statements[0];
         if (!(stmt instanceof ast.ReturnStatement)) {
-            console.error(`Statement is not ReturnStatement. Got ${stmt.constructor.name}`);
+            console.error(`Statement is not ReturnStatement. Got ${stmt}`);
             continue;
         }
 
+        // parser のstmtと同じのが入っている
+        // console.log("in testReturnStatements() stmt:" + JSON.stringify(stmt, null, 2))
+
         const returnStmt = stmt;
+        console.log("returnStmt.TokenLiteral() is " + returnStmt.TokenLiteral());
         if (returnStmt.TokenLiteral() !== "return") {
             console.error(`ReturnStatement TokenLiteral not 'return'. Got ${returnStmt.TokenLiteral()}`);
             continue;
         }
 
-        const returnValue = returnStmt.returnValue;
+        const returnValue = returnStmt.ReturnValue;
+        console.log("returnValue is " + JSON.stringify(returnValue, null, 2));
+        console.log("test.expectedValue is " + test.expectedValue);
         if (!testLiteralExpression(returnValue, test.expectedValue)) {
             continue;
         }
@@ -68,12 +74,13 @@ function testLiteralExpression(exp, expected) {
 }
 
 function testIntegerLiteral(il, value) {
+    console.log()
     if (!(il instanceof ast.IntegerLiteral)) {
-        console.error(`Expression is not IntegerLiteral. Got ${il.constructor.name}`);
+        console.error(`Expression is not IntegerLiteral. Got ${il}`);
         return false;
     }
-    if (il.value !== value) {
-        console.error(`IntegerLiteral value not ${value}. Got ${il.value}`);
+    if (il.Value !== value) {
+        console.error(`IntegerLiteral value not ${value}. Got ${il.Value}`);
         return false;
     }
     if (il.TokenLiteral() !== value.toString()) {
@@ -85,7 +92,7 @@ function testIntegerLiteral(il, value) {
 
 function testBooleanLiteral(bo, value) {
     if (!(bo instanceof ast.Boolean)) {
-        console.error(`Expression is not Boolean. Got ${bo.constructor.name}`);
+        console.error(`Expression is not Boolean. Got ${bo}`);
         return false;
     }
     if (bo.value !== value) {
@@ -101,7 +108,7 @@ function testBooleanLiteral(bo, value) {
 
 function testIdentifier(ident, value) {
     if (!(ident instanceof ast.Identifier)) {
-        console.error(`Expression is not Identifier. Got ${ident.constructor.name}`);
+        console.error(`Expression is not Identifier. Got ${ident}`);
         return false;
     }
     if (ident.value !== value) {

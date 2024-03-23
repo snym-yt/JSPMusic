@@ -96,8 +96,10 @@ class Parser {
             console.log("stmt:" + JSON.stringify(stmt, null, 2))
             if (stmt !== null) {
                 program.Statements.push(stmt);
+                // console.log("in parseProgram, now program.Statements: " + JSON.stringify(program.Statements, null, 2));
             }
             this.nextToken();
+            console.log("in parseProgram, now curToken.type is " + this.curToken.type);
         }
         return program;
     }

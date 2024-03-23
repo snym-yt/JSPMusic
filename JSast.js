@@ -47,7 +47,7 @@ class VarStatement extends Statement {
   statementNode() {}
 
   TokenLiteral() {
-    return this.Token.Literal;
+    return this.Token.literal;
   }
 
   String() {
@@ -71,7 +71,7 @@ class ReturnStatement extends Statement {
   statementNode() {}
 
   TokenLiteral() {
-    return this.Token.Literal;
+    return this.Token.Token.literal;
   }
 
   String() {
@@ -94,7 +94,7 @@ class Identifier extends Expression {
   expressionNode() {}
 
   TokenLiteral() {
-    return this.Token.Literal;
+    return this.Token.literal;
   }
 
   String() {
@@ -112,7 +112,7 @@ class ExpressionStatement extends Statement {
     statementNode() {}
   
     TokenLiteral() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
   
     String() {
@@ -133,11 +133,11 @@ class IntegerLiteral extends Expression {
     expressionNode() {}
   
     TokenLiteral() {
-      return this.Token.Literal;
+      return this.Token.Token.literal;
     }
   
     String() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
   }
 
@@ -152,7 +152,7 @@ class PrefixExpression extends Expression {
   expressionNode() {}
 
   TokenLiteral() {
-    return this.Token.Literal;
+    return this.Token.literal;
   }
 
   String() {
@@ -172,7 +172,7 @@ class InfixExpression extends Expression {
     expressionNode() {}
   
     TokenLiteral() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
   
     String() {
@@ -190,11 +190,11 @@ class Boolean extends Expression {
     expressionNode() {}
   
     TokenLiteral() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
   
     String() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
 }
 
@@ -210,7 +210,7 @@ class IfExpression extends Expression {
     expressionNode() {}
   
     TokenLiteral() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
   
     String() {
@@ -236,7 +236,7 @@ class BlockStatement extends Node {
     statementNode() {}
   
     TokenLiteral() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
   
     String() {
@@ -259,7 +259,7 @@ class FunctionLiteral extends Expression {
     expressionNode() {}
   
     TokenLiteral() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
   
     String() {
@@ -282,7 +282,7 @@ class CallExpression extends Expression {
     expressionNode() {}
   
     TokenLiteral() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
   
     String() {
@@ -303,11 +303,11 @@ class StringLiteral extends Expression {
     expressionNode() {}
   
     TokenLiteral() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
   
     String() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
 }
 
@@ -321,7 +321,7 @@ class ArrayLiteral extends Expression {
     expressionNode() {}
   
     TokenLiteral() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
   
     String() {
@@ -341,7 +341,7 @@ class IndexExpression extends Expression {
     expressionNode() {}
   
     TokenLiteral() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
   
     String() {
@@ -360,7 +360,7 @@ class HashLiteral extends Expression {
     expressionNode() {}
   
     TokenLiteral() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
   
     String() {
@@ -399,11 +399,11 @@ class FloatLiteral extends Expression {
     expressionNode() {}
   
     TokenLiteral() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
   
     String() {
-      return this.Token.Literal;
+      return this.Token.literal;
     }
 }
   
