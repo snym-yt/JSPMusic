@@ -42,8 +42,8 @@ function testReturnStatements() {
         }
 
         const returnStmt = stmt;
-        if (returnStmt.tokenLiteral() !== "return") {
-            console.error(`ReturnStatement tokenLiteral not 'return'. Got ${returnStmt.tokenLiteral()}`);
+        if (returnStmt.TokenLiteral() !== "return") {
+            console.error(`ReturnStatement TokenLiteral not 'return'. Got ${returnStmt.TokenLiteral()}`);
             continue;
         }
 
@@ -76,8 +76,8 @@ function testIntegerLiteral(il, value) {
         console.error(`IntegerLiteral value not ${value}. Got ${il.value}`);
         return false;
     }
-    if (il.tokenLiteral() !== value.toString()) {
-        console.error(`IntegerLiteral tokenLiteral not ${value}. Got ${il.tokenLiteral()}`);
+    if (il.TokenLiteral() !== value.toString()) {
+        console.error(`IntegerLiteral TokenLiteral not ${value}. Got ${il.TokenLiteral()}`);
         return false;
     }
     return true;
@@ -92,8 +92,8 @@ function testBooleanLiteral(bo, value) {
         console.error(`Boolean value not ${value}. Got ${bo.value}`);
         return false;
     }
-    if (bo.tokenLiteral() !== value.toString()) {
-        console.error(`Boolean tokenLiteral not ${value}. Got ${bo.tokenLiteral()}`);
+    if (bo.TokenLiteral() !== value.toString()) {
+        console.error(`Boolean TokenLiteral not ${value}. Got ${bo.TokenLiteral()}`);
         return false;
     }
     return true;
@@ -108,8 +108,8 @@ function testIdentifier(ident, value) {
         console.error(`Identifier value not ${value}. Got ${ident.value}`);
         return false;
     }
-    if (ident.tokenLiteral() !== value) {
-        console.error(`Identifier tokenLiteral not ${value}. Got ${ident.tokenLiteral()}`);
+    if (ident.TokenLiteral() !== value) {
+        console.error(`Identifier TokenLiteral not ${value}. Got ${ident.TokenLiteral()}`);
         return false;
     }
     return true;

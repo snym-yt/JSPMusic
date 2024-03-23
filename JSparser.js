@@ -139,8 +139,10 @@ class Parser {
         console.log("in praseReturnStatement after nextToken(), now curToken.type is " + this.curToken.type)
         console.log("in praseReturnStatement after nextToken(), now peekToken.type is " + this.peekToken.type)
         stmt.ReturnValue = this.parseExpression(LOWEST);
-        while (!this.peekTokenIs(`;`)) {
+        console.log("in praseReturnStatement after nextToken(), now peekToken.type is " + this.peekToken.type)
+        while (!this.peekTokenIs("SEMICOLON")) {
             this.nextToken();
+            console.log("a");
         }
         this.nextToken();
         return stmt;
@@ -149,7 +151,7 @@ class Parser {
     parseExpressionStatement() {
         const stmt = new ast.ExpressionStatement({ Token: this.curToken });
         stmt.Expression = this.parseExpression(LOWEST);
-        if (this.peekTokenIs(`;`)) {
+        if (this.peekTokenIs(`SEMICOLON`)) {
             this.nextToken();
         }
         return stmt;
@@ -164,8 +166,13 @@ class Parser {
         }
         // let leftExp = prefix();
         let leftExp = prefix.bind(this)();
-        console.log("complete let leftExp");
-        while (!this.peekTokenIs(`;`) && precedence < this.peekPrecedence()) {
+        console.log("in parseExpression, now this.peekTokenIs(`;`) is " + this.peekTokenIs(`;`));
+        console.log("in parseExpression, now this.peekToken.type is " + this.peekToken.type);
+
+        // let count = 0;
+        while (!this.peekTokenIs(`SEMICOLON`) && precedence < this.peekPrecedence()) {
+            // count++;
+            // if(count > 5) return leftExp;
             const infix = this.infixParseFns[this.peekToken.type];
             if (!infix) {
                 return leftExp;
@@ -173,6 +180,7 @@ class Parser {
             this.nextToken();
             leftExp = infix(leftExp);
         }
+        console.log("in parseExpression, next return leftExp;")
         return leftExp;
     }
 
@@ -189,13 +197,15 @@ class Parser {
         console.log("in praseIntegerLiteral, now curToken.type is " + this.curToken.type)
         const lit = new ast.IntegerLiteral({ Token: this.curToken });
         const value = parseInt(this.curToken.literal, 10);  // stringをint(10進数)に
-        console.log(value);
+        // console.log(value);
+        console.log("in parseIntegerLiteral, now curToken.literal is " + this.curToken.literal);
         if (isNaN(value)) {
             const msg = `could not parse ${this.curToken.literal} as integer`;
             this.errors.push(msg);
             return null;
         }
         lit.Value = value;
+        console.log("in parseIntegerLiteral, now lit.Value is " + lit.Value);
         return lit;
     }
 
@@ -204,6 +214,7 @@ class Parser {
     }
 
     peekTokenIs(t) {
+        // console.log("in peekTokenIs, now peekToken.type is " + this.peekToken.type);
         return this.peekToken.type === t;
     }
 
