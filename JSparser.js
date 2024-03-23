@@ -119,7 +119,7 @@ class Parser {
         if (!this.expectPeek(`IDENT`)) {
             return null;
         }
-        stmt.Name = new ast.Identifier({ Token: this.curToken, Value: this.curToken.Literal });
+        stmt.Name = new ast.Identifier({ Token: this.curToken, Value: this.curToken.literal });
         if (!this.expectPeek(`=`)) {
             return null;
         }
@@ -182,16 +182,16 @@ class Parser {
     }
 
     parseIdentifier() {
-        return new ast.Identifier({ Token: this.curToken, Value: this.curToken.Literal });
+        return new ast.Identifier({ Token: this.curToken, Value: this.curToken.literal });
     }
 
     parseIntegerLiteral() {
         console.log("in praseIntegerLiteral, now curToken.type is " + this.curToken.type)
         const lit = new ast.IntegerLiteral({ Token: this.curToken });
-        const value = parseInt(this.curToken.Literal, 10);  // stringをint(10進数)に
+        const value = parseInt(this.curToken.literal, 10);  // stringをint(10進数)に
         console.log(value);
         if (isNaN(value)) {
-            const msg = `could not parse ${this.curToken.Literal} as integer`;
+            const msg = `could not parse ${this.curToken.literal} as integer`;
             this.errors.push(msg);
             return null;
         }
@@ -228,7 +228,7 @@ class Parser {
     parsePrefixExpression() {
         const expression = new ast.PrefixExpression({
             Token: this.curToken,
-            Operator: this.curToken.Literal,
+            Operator: this.curToken.literal,
         });
         this.nextToken();
         expression.Right = this.parseExpression(PREFIX);
@@ -248,7 +248,7 @@ class Parser {
     parseInfixExpression(left) {
         const expression = new ast.InfixExpression({
             Token: this.curToken,
-            Operator: this.curToken.Literal,
+            Operator: this.curToken.literal,
             Left: left,
         });
         const precedence = this.curPrecedence();
@@ -328,12 +328,12 @@ class Parser {
             return identifiers;
         }
         this.nextToken();
-        const ident = new ast.Identifier({ Token: this.curToken, Value: this.curToken.Literal });
+        const ident = new ast.Identifier({ Token: this.curToken, Value: this.curToken.literal });
         identifiers.push(ident);
         while (this.peekTokenIs(`,`)) {
             this.nextToken();
             this.nextToken();
-            const ident = new ast.Identifier({ Token: this.curToken, Value: this.curToken.Literal });
+            const ident = new ast.Identifier({ Token: this.curToken, Value: this.curToken.literal });
             identifiers.push(ident);
         }
         if (!this.expectPeek(`)`)) {
@@ -349,7 +349,7 @@ class Parser {
     }
 
     parseStringLiteral() {
-        return new ast.StringLiteral({ Token: this.curToken, Value: this.curToken.Literal });
+        return new ast.StringLiteral({ Token: this.curToken, Value: this.curToken.literal });
     }
 
     parseArrayLiteral() {
@@ -428,9 +428,9 @@ class Parser {
 
     parseFloatLiteral() {
         const lit = new ast.FloatLiteral({ Token: this.curToken });
-        const value = parseFloat(this.curToken.Literal);
+        const value = parseFloat(this.curToken.literal);
         if (isNaN(value)) {
-            const msg = `could not parse ${this.curToken.Literal} as float`;
+            const msg = `could not parse ${this.curToken.literal} as float`;
             this.errors.push(msg);
             return null;
         }
