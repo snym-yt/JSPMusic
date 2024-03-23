@@ -162,7 +162,8 @@ class Parser {
             this.noPrefixParseFnError(this.curToken.type);
             return null;
         }
-        let leftExp = prefix();
+        // let leftExp = prefix();
+        let leftExp = prefix.bind(this)();
         console.log("complete let leftExp");
         while (!this.peekTokenIs(`;`) && precedence < this.peekPrecedence()) {
             const infix = this.infixParseFns[this.peekToken.type];
