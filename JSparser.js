@@ -459,7 +459,5 @@ class Parser {
 function newParser(l) {
     return new Parser(l);
 }
-// module.exports = { newParser };
 
-// module.exports = Parser;
 module.exports = { newParser, Parser };
