@@ -96,7 +96,13 @@ function testBooleanLiteral(bo, value) {
         console.error(`Expression is not Boolean. Got ${bo}`);
         return false;
     }
-    if (bo.Token.Value !== value) { // なぜかIntegerLiteralと構造が違くなってる
+
+    // なぜかIntegerLiteralと構造が違くなってる
+    // JSparser.jsの中で
+    // const lit = new ast.IntegerLiteral({ Token: this.curToken });
+    // new ast.Boolean({ Token: this.curToken, Value: this.curTokenIs(`TRUE`) });
+    // で new の時の渡してるものが異なるのが原因っぽい
+    if (bo.Token.Value !== value) { 
         console.error(`Boolean value not ${value}. Got ${bo.Token.Value}`);
         return false;
     }
