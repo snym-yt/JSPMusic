@@ -20,7 +20,7 @@ function checkParserErrors(p) {
 function testReturnStatements() {
     const tests = [
         { input: "return 5 ;", expectedValue: 5 },
-        // { input: "return true;", expectedValue: true },
+        { input: "return true;", expectedValue: true },
         // { input: "return y;", expectedValue: "y" },
     ];
 
@@ -74,7 +74,6 @@ function testLiteralExpression(exp, expected) {
 }
 
 function testIntegerLiteral(il, value) {
-    console.log()
     if (!(il instanceof ast.IntegerLiteral)) {
         console.error(`Expression is not IntegerLiteral. Got ${il}`);
         console.log(JSON.stringify(il, null, 2))
@@ -92,12 +91,13 @@ function testIntegerLiteral(il, value) {
 }
 
 function testBooleanLiteral(bo, value) {
+    // console.log(JSON.stringify(bo, null, 2))
     if (!(bo instanceof ast.Boolean)) {
         console.error(`Expression is not Boolean. Got ${bo}`);
         return false;
     }
-    if (bo.value !== value) {
-        console.error(`Boolean value not ${value}. Got ${bo.value}`);
+    if (bo.Token.Value !== value) { // なぜかIntegerLiteralと構造が違くなってる
+        console.error(`Boolean value not ${value}. Got ${bo.Token.Value}`);
         return false;
     }
     if (bo.TokenLiteral() !== value.toString()) {
