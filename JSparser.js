@@ -15,17 +15,17 @@ const INDEX = 8;    //array[index]
 
 
 const precedences = {
-    [`==`]: EQUALS,
-    [`!=`]: EQUALS,
-    [`<`]: LESSGREATER,
-    [`>`]: LESSGREATER,
-    [`+`]: SUM,
-    [`-`]: SUM,
-    [`/`]: PRODUCT,
-    [`*`]: PRODUCT,
-    [`^`]: POWER,
-    [`(`]: CALL,
-    [`[`]: INDEX,
+    [`EQ`]: EQUALS,
+    [`NOT_EQ`]: EQUALS,
+    [`LT`]: LESSGREATER,
+    [`GT`]: LESSGREATER,
+    [`PLUS`]: SUM,
+    [`MINUS`]: SUM,
+    [`SLASH`]: PRODUCT,
+    [`ASTERISK`]: PRODUCT,
+    [`HAT`]: POWER,
+    [`LPAREN`]: CALL,
+    [`LBRACKET`]: INDEX,
 };
 
 class Parser {
@@ -52,17 +52,17 @@ class Parser {
         this.registerPrefix(`LOOP`, this.parseLoopExpression);
 
         this.infixParseFns = {};
-        this.registerInfix(`+`, this.parseInfixExpression);
-        this.registerInfix(`-`, this.parseInfixExpression);
-        this.registerInfix(`/`, this.parseInfixExpression);
-        this.registerInfix(`*`, this.parseInfixExpression);
-        this.registerInfix(`==`, this.parseInfixExpression);
-        this.registerInfix(`!=`, this.parseInfixExpression);
-        this.registerInfix(`<`, this.parseInfixExpression);
-        this.registerInfix(`>`, this.parseInfixExpression);
-        this.registerInfix(`^`, this.parseInfixExpression);
-        this.registerInfix(`(`, this.parseCallExpression);
-        this.registerInfix(`[`, this.parseIndexExpression);
+        this.registerInfix(`PLUS`, this.parseInfixExpression);
+        this.registerInfix(`MINUS`, this.parseInfixExpression);
+        this.registerInfix(`SLASH`, this.parseInfixExpression);
+        this.registerInfix(`ASTERISK`, this.parseInfixExpression);
+        this.registerInfix(`EQ`, this.parseInfixExpression);
+        this.registerInfix(`NOT_EQ`, this.parseInfixExpression);
+        this.registerInfix(`LT`, this.parseInfixExpression);
+        this.registerInfix(`GT`, this.parseInfixExpression);
+        this.registerInfix(`HAT`, this.parseInfixExpression);
+        this.registerInfix(`LPAREN`, this.parseCallExpression);
+        this.registerInfix(`LBRACKET`, this.parseIndexExpression);
 
         //2つのトークンを読み込む，curToken, peekTokenの両方をセットする
         this.nextToken();
@@ -81,6 +81,7 @@ class Parser {
     nextToken() {
         this.curToken = this.peekToken;
         this.peekToken = this.l.nextToken();
+        // console.log("new curToken:" + this.curToken + "   new peekToken:" + this.peekToken);
     }
 
     parseProgram() {
@@ -144,7 +145,7 @@ class Parser {
         console.log("in praseReturnStatement after nextToken(), now peekToken.type is " + this.peekToken.type)
         while (!this.peekTokenIs("SEMICOLON")) {
             this.nextToken();
-            console.log("a");
+            console.log("in parseReturnStatement↓\nnew curToken:" + this.curToken.type + "   new peekToken:" + this.peekToken.type);
         }
         this.nextToken();
         return stmt;
@@ -169,18 +170,18 @@ class Parser {
         // let leftExp = prefix();
         let leftExp = prefix.bind(this)();
         console.log("in parseExpression, now this.peekTokenIs(`;`) is " + this.peekTokenIs(`;`));
+        console.log("in parseExpression, now precedence is " + precedence + "   this.peekPrecedence() is " + this.peekPrecedence());
         console.log("in parseExpression, now this.peekToken.type is " + this.peekToken.type);
 
-        // let count = 0;
-        while (!this.peekTokenIs(`SEMICOLON`) && precedence < this.peekPrecedence()) {
-            // count++;
-            // if(count > 5) return leftExp;
+        while (!this.peekTokenIs(`;`) && precedence < this.peekPrecedence()) {
+            console.log("[while in parseExpression]");
             const infix = this.infixParseFns[this.peekToken.type];
             if (!infix) {
+                console.log("!infix");
                 return leftExp;
             }
             this.nextToken();
-            leftExp = infix(leftExp);
+            leftExp = infix.bind(this)(leftExp);
         }
         console.log("in parseExpression, next return leftExp;")
         return leftExp;
@@ -249,6 +250,7 @@ class Parser {
     }
 
     peekPrecedence() {
+        console.log("in peekPrecedence(), this.peekToken.type is " + this.peekToken.type);
         const precedence = precedences[this.peekToken.type];
         return precedence || LOWEST;
     }

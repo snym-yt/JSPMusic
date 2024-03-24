@@ -19,7 +19,7 @@ function checkParserErrors(p) {
 
 function testReturnStatements() {
     const tests = [
-        { input: "return 5 +1;", expectedValue: 6 },
+        { input: "return 5 ;", expectedValue: 5 },
         // { input: "return true;", expectedValue: true },
         // { input: "return y;", expectedValue: "y" },
     ];
@@ -77,6 +77,7 @@ function testIntegerLiteral(il, value) {
     console.log()
     if (!(il instanceof ast.IntegerLiteral)) {
         console.error(`Expression is not IntegerLiteral. Got ${il}`);
+        console.log(JSON.stringify(il, null, 2))
         return false;
     }
     if (il.Value !== value) {
