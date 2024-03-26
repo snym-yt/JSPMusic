@@ -94,7 +94,7 @@ class Identifier extends Expression {
   expressionNode() {}
 
   TokenLiteral() {
-    return this.Token.literal;
+    return this.Token.Token.literal;
   }
 
   String() {
@@ -190,7 +190,7 @@ class Boolean extends Expression {
     expressionNode() {}
   
     TokenLiteral() {
-      return this.Token.literal;
+      return this.Token.Token.literal;
     }
   
     String() {

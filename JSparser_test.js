@@ -21,7 +21,7 @@ function testReturnStatements() {
     const tests = [
         { input: "return 5 ;", expectedValue: 5 },
         { input: "return true;", expectedValue: true },
-        // { input: "return y;", expectedValue: "y" },
+        { input: "return y;", expectedValue: "y" },
     ];
 
     for (const test of tests) {
@@ -118,8 +118,8 @@ function testIdentifier(ident, value) {
         console.error(`Expression is not Identifier. Got ${ident}`);
         return false;
     }
-    if (ident.value !== value) {
-        console.error(`Identifier value not ${value}. Got ${ident.value}`);
+    if (ident.Token.Value !== value) {
+        console.error(`Identifier value not ${value}. Got ${ident.Token.Value}`);
         return false;
     }
     if (ident.TokenLiteral() !== value) {
