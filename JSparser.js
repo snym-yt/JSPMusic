@@ -123,12 +123,12 @@ class Parser {
             return null;
         }
         stmt.Name = new ast.Identifier({ Token: this.curToken, Value: this.curToken.literal });
-        if (!this.expectPeek(`=`)) {
+        if (!this.expectPeek(`ASSIGN`)) {
             return null;
         }
         this.nextToken();
         stmt.Value = this.parseExpression(LOWEST);
-        while (!this.peekTokenIs(`;`)) {
+        while (!this.peekTokenIs(`SEMICOLON`)) {
             this.nextToken();
         }
         this.nextToken();
@@ -152,6 +152,7 @@ class Parser {
     }
 
     parseExpressionStatement() {
+        console.log("start praseReturnStatement, curToken.type is " + this.curToken.type)
         const stmt = new ast.ExpressionStatement({ Token: this.curToken });
         stmt.Expression = this.parseExpression(LOWEST);
         if (this.peekTokenIs(`SEMICOLON`)) {
@@ -167,11 +168,9 @@ class Parser {
             this.noPrefixParseFnError(this.curToken.type);
             return null;
         }
-        // let leftExp = prefix();
         let leftExp = prefix.bind(this)();
-        console.log("in parseExpression, now this.peekTokenIs(`;`) is " + this.peekTokenIs(`;`));
-        console.log("in parseExpression, now precedence is " + precedence + "   this.peekPrecedence() is " + this.peekPrecedence());
-        console.log("in parseExpression, now this.peekToken.type is " + this.peekToken.type);
+        console.log("in parseExpression, this.peekTokenIs(`;`) is " + this.peekTokenIs(`;`) + ",  this.peekToken.type is " + this.peekToken.type);
+        console.log("in parseExpression, precedence is " + precedence + "   this.peekPrecedence() is " + this.peekPrecedence());
 
         while (!this.peekTokenIs(`;`) && precedence < this.peekPrecedence()) {
             console.log("[while in parseExpression]");
@@ -197,18 +196,17 @@ class Parser {
     }
 
     parseIntegerLiteral() {
-        console.log("in praseIntegerLiteral, now curToken.type is " + this.curToken.type)
+        console.log("in praseIntegerLiteral, curToken.type is " + this.curToken.type + ", curToken.literal is " + this.curToken.literal)
         const lit = new ast.IntegerLiteral({ Token: this.curToken });
         const value = parseInt(this.curToken.literal, 10);  // stringをint(10進数)に
         // console.log(value);
-        console.log("in parseIntegerLiteral, now curToken.literal is " + this.curToken.literal);
         if (isNaN(value)) {
             const msg = `could not parse ${this.curToken.literal} as integer`;
             this.errors.push(msg);
             return null;
         }
         lit.Value = value;
-        console.log("in parseIntegerLiteral, now lit.Value is " + lit.Value);
+        console.log("in parseIntegerLiteral, lit.Value is " + lit.Value);
         return lit;
     }
 
@@ -279,7 +277,8 @@ class Parser {
     parseGroupedExpression() {
         this.nextToken();
         const exp = this.parseExpression(LOWEST);
-        if (!this.expectPeek(`)`)) {
+        if (!this.expectPeek(`RPAREN`)) {
+            console.log(`in parseGroupedExpression, this.expectReek('RPAREN') is true`)
             return null;
         }
         return exp;
@@ -287,21 +286,21 @@ class Parser {
 
     parseIfExpression() {
         const expression = new ast.IfExpression({ Token: this.curToken });
-        if (!this.expectPeek(`(`)) {
+        if (!this.expectPeek(`LPAREN`)) {
             return null;
         }
         this.nextToken();
         expression.Condition = this.parseExpression(LOWEST);
-        if (!this.expectPeek(`)`)) {
+        if (!this.expectPeek(`RPAREN`)) {
             return null;
         }
-        if (!this.expectPeek(`{`)) {
+        if (!this.expectPeek(`LBRACE`)) {
             return null;
         }
         expression.Consequence = this.parseBlockStatement();
         if (this.peekTokenIs(`FALSE`)) {
             this.nextToken();
-            if (!this.expectPeek(`{`)) {
+            if (!this.expectPeek(`LBRACE`)) {
                 return null;
             }
             expression.Alternative = this.parseBlockStatement();
@@ -313,7 +312,7 @@ class Parser {
         const block = new ast.BlockStatement({ Token: this.curToken });
         block.Statements = [];
         this.nextToken();
-        while (!this.curTokenIs(`}`) && !this.curTokenIs(`EOF`)) {
+        while (!this.curTokenIs(`RBRACE`) && !this.curTokenIs(`EOF`)) {
             const stmt = this.parseStatement();
             if (stmt !== null) {
                 block.Statements.push(stmt);
@@ -325,11 +324,11 @@ class Parser {
 
     parseFunctionLiteral() {
         const lit = new ast.FunctionLiteral({ Token: this.curToken });
-        if (!this.expectPeek(`(`)) {
+        if (!this.expectPeek(`LPAREN`)) {
             return null;
         }
         lit.Parameters = this.parseFunctionParameters();
-        if (!this.expectPeek(`{`)) {
+        if (!this.expectPeek(`LBRACE`)) {
             return null;
         }
         lit.Body = this.parseBlockStatement();
@@ -338,7 +337,7 @@ class Parser {
 
     parseFunctionParameters() {
         const identifiers = [];
-        if (this.peekTokenIs(`)`)) {
+        if (this.peekTokenIs(`RPAREN`)) {
             this.nextToken();
             return identifiers;
         }
@@ -351,7 +350,7 @@ class Parser {
             const ident = new ast.Identifier({ Token: this.curToken, Value: this.curToken.literal });
             identifiers.push(ident);
         }
-        if (!this.expectPeek(`)`)) {
+        if (!this.expectPeek(`RPAREN`)) {
             return null;
         }
         return identifiers;
@@ -396,7 +395,7 @@ class Parser {
         const exp = new ast.IndexExpression({ Token: this.curToken, Left: left });
         this.nextToken();
         exp.Index = this.parseExpression(LOWEST);
-        if (!this.expectPeek(`]`)) {
+        if (!this.expectPeek(`RBRACKET`)) {
             return null;
         }
         return exp;
@@ -408,7 +407,7 @@ class Parser {
         while (!this.peekTokenIs(`}`)) {
             this.nextToken();
             const key = this.parseExpression(LOWEST);
-            if (!this.expectPeek(`:`)) {
+            if (!this.expectPeek(`COLON`)) {
                 return null;
             }
             this.nextToken();
@@ -455,15 +454,15 @@ class Parser {
 
     parseLoopExpression() {
         const expression = new ast.LoopExpression({ Token: this.curToken });
-        if (!this.expectPeek(`(`)) {
+        if (!this.expectPeek(`LPAREN`)) {
             return null;
         }
         this.nextToken();
         expression.Condition = this.parseExpression(LOWEST);
-        if (!this.expectPeek(`)`)) {
+        if (!this.expectPeek(`RPAREN`)) {
             return null;
         }
-        if (!this.expectPeek(`{`)) {
+        if (!this.expectPeek(`LBRACE`)) {
             return null;
         }
         expression.Consequence = this.parseBlockStatement();

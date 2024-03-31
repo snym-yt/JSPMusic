@@ -60,6 +60,59 @@ function testReturnStatements() {
     }
 }
 
+function testLoopExpression() {
+    const tests = [
+        `loop(4) {return true;}`,
+    ];
+
+    for (const test of tests) {
+        const l = newLexer(test);
+        const p = newParser(l);
+        const program = p.parseProgram();
+        checkParserErrors(p);
+
+        if (program.Statements.length !== 1) {
+            console.error(`Program statements do not contain 1 statement. Got ${program.Statements.length}`);
+            continue;
+        }
+
+        const stmt = program.Statements[0];
+        if (!(stmt instanceof ast.ExpressionStatement)) {
+            console.error(`Statement is not ExpressionStatement. Got ${stmt}`);
+            continue;
+        }
+
+        // parser のstmtと同じのが入っている
+        // console.log("in testReturnStatements() stmt:" + JSON.stringify(stmt, null, 2))
+
+        const exp = stmt.Expression;
+        console.log("exp.TokenLiteral() is " + exp.TokenLiteral());
+        if (!(exp instanceof ast.LoopExpression)) {
+            console.error(`stmt.Expression is not ast.LoopExpression. Got ${exp.TokenLiteral()}`);
+            continue;
+        }
+
+        if (!(testIntegerLiteral(exp.Condition, 4))){
+            console.error(`exp.Condition is Error.`);
+            continue;
+        }
+
+        if (exp.Consequence.Statements.length != 1){
+            console.error(`Consequence is not 1 statements. Got ${length(exp.Consequence.Statements)}`)
+        }
+
+        const consequence = exp.Consequence.Statements[0]
+        if (!(consequence instanceof ast.ReturnStatement)) {
+            console.error(`consequence is not ast.ReturnStatement. Got ${consequence.TokenLiteral()}`);
+            continue;
+        }
+
+        if (!testReturnStatements(consequence, "true")){
+            continue;
+        }
+    }
+}
+
 function testLiteralExpression(exp, expected) {
     if (typeof expected === "number") {
         return testIntegerLiteral(exp, expected);
@@ -132,4 +185,5 @@ function testIdentifier(ident, value) {
 // Add other test functions as needed...
 
 // Run the test functions
-testReturnStatements();
+// testReturnStatements();
+testLoopExpression();
