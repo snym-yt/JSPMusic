@@ -115,6 +115,45 @@ function testLoopExpression() {
     }
 }
 
+
+function testFloatLiteralExpression() {
+    const input = "1.2;";
+    const l = newLexer(input);
+    const p = newParser(l);
+    const program = p.parseProgram();
+    checkParserErrors(p);
+
+    if (program.Statements.length !== 1) {
+        console.error(`program has not enough statements. Got ${program.Statements.length}`);
+        return;
+    }
+
+    const stmt = program.Statements[0];
+    if (!(stmt instanceof ast.ExpressionStatement)) {
+        console.error(`program.Statements[0] is not ast.ExpressionStatement. Got ${typeof stmt}`);
+        return;
+    }
+
+    const literal = stmt.Expression;
+    if (!(literal instanceof ast.FloatLiteral)) {
+        console.error(`exp not ast.FloatLiteral. Got ${typeof literal}`);
+        return;
+    }
+
+    if (literal.TokenLiteral() !== "1.2") {
+        console.error(`literal.TokenLiteral not '1.2'. Got ${literal.TokenLiteral()}`);
+        return;
+    }
+
+    console.log("testFloatLiteralExpression passed successfully.");
+}
+
+
+
+
+
+
+
 function testLiteralExpression(exp, expected) {
     if (typeof expected === "number") {
         return testIntegerLiteral(exp, expected);
@@ -188,4 +227,5 @@ function testIdentifier(ident, value) {
 
 // Run the test functions
 // testReturnStatements();
-testLoopExpression();
+// testLoopExpression();
+testFloatLiteralExpression();

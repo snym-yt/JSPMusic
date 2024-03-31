@@ -399,11 +399,11 @@ class FloatLiteral extends Expression {
     expressionNode() {}
   
     TokenLiteral() {
-      return this.Token.literal;
+      return this.Token.Token.literal;
     }
   
     String() {
-      return this.Token.literal;
+      return this.Token.Token.literal;
     }
 }
   
