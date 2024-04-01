@@ -19,9 +19,9 @@ function checkParserErrors(p) {
 
 function testReturnStatements() {
     const tests = [
-        // { input: "return 5 ;", expectedValue: 5 },
-        // { input: "return true;", expectedValue: true },
-        // { input: "return y;", expectedValue: "y" },
+        { input: "return 5 ;", expectedValue: 5 },
+        { input: "return true;", expectedValue: true },
+        { input: "return y;", expectedValue: "y" },
     ];
 
     for (const test of tests) {
@@ -148,8 +148,108 @@ function testFloatLiteralExpression() {
     console.log("testFloatLiteralExpression passed successfully.");
 }
 
+function testIfElseExpression() {
+    const input = `if (1+2 < y) {return true;} else {y}`;
+
+    const l = newLexer(input);
+    const p = newParser(l);
+    const program = p.parseProgram();
+    checkParserErrors(p);
+
+    if (program.Statements.length !== 1) {
+        console.error(`program.Statements[0] does not contain 1 statements. Got ${program.Statements.length}`);
+        return;
+    }
+
+    const stmt = program.Statements[0];
+    if (!(stmt instanceof ast.ExpressionStatement)) {
+        console.error(`program.Statements[0] is not ast.ExpressionStatement. Got ${typeof stmt.Expression}`);
+        return;
+    }
+
+    const exp = stmt.Expression;
+    if (!(exp instanceof ast.IfExpression)) {
+        console.error(`stmt.Expression is not ast.IfExpression. Got ${typeof exp}`);
+        return;
+    }
+
+    console.log("\nexp.Condition is \n" + JSON.stringify(exp.Condition, null, 2))
+    if (!testInfixExpression(exp.Condition, "x", "<", "y")) {
+        return;
+    }
+
+    if (exp.Consequence.Statements.length !== 1) {
+        console.error(`Consequence is not 1 statements. Got ${exp.Consequence.Statements.length}`);
+        return;
+    }
+
+    const consequence = exp.Consequence.Statements[0];
+    if (!(consequence instanceof ast.ExpressionStatement)) {
+        console.error(`Statements[0] is not ast.ExpressionStatement. Got ${typeof consequence}`);
+        return;
+    }
+
+    console.log("\nconsequence is \n" + JSON.stringify(consequence, null, 2))
+    if (!testIdentifier(consequence.Expression, "x")) {
+        return;
+    }
+
+    if (exp.Alternative === null) {
+        console.error(`exp.Alternative.Statements was null. Got ${exp.Alternative}`);
+        return;
+    }
+
+    if (exp.Alternative.Statements.length !== 1) {
+        console.error(`Alternative is not 1 statements. Got ${exp.Consequence.Statements.length}`);
+        return;
+    }
+
+    const alternative = exp.Alternative.Statements[0];
+    if (!(alternative instanceof ast.ExpressionStatement)) {
+        console.error(`Statements[0] is not ast.ExpressionStatement. Got ${typeof alternative}`);
+        return;
+    }
+
+    if (!testIdentifier(alternative.Expression, "y")) {
+        return;
+    }
+
+    console.log("testIfElseExpression passed successfully.");
+}
+
+function testOperatorPrecedenceParsing() {
+    const tests = [
+        // { input: "true", expected: "true" },
+        // { input: "false", expected: "false" },
+        // { input: "3 > 5 == false", expected: "((3 < 5) == true)" },
+        { input: "1 + (2 + 3) + 4", expected: "((1 + (2 + 3)) + 4)" },
+        { input: "(5 + 5) * 2", expected: "((5 + 5) * 2)" },
+        { input: "2 / (5+5)", expected: "(-(5 + 5))" },
+        { input: "!(true == true)", expected: "(!(true == true))" },
+    ];
+
+    for (const tt of tests) {
+        const l = newLexer(tt.input);
+        const p = newParser(l);
+        const program = p.parseProgram();
+        checkParserErrors(p);
+        console.log("\n\n");
+
+        if (program.Statements.length !== 1) {
+            console.error(`program has not enough statements. Got ${program.Statements.length}`);
+        }
+    }
+    console.log("testOpratorPrecedenceParsing passed successfully.");
+}
 
 
+
+
+
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
 
 
 
@@ -160,6 +260,7 @@ function testLiteralExpression(exp, expected) {
     } else if (typeof expected === "boolean") {
         return testBooleanLiteral(exp, expected);
     } else if (typeof expected === "string") {
+        console.log(JSON.stringify(exp, null, 2))
         return testIdentifier(exp, expected);
     } else {
         console.error(`Type of expected not handled. Got ${typeof expected}`);
@@ -185,7 +286,6 @@ function testIntegerLiteral(il, value) {
 }
 
 function testBooleanLiteral(bo, value) {
-    // console.log(JSON.stringify(bo, null, 2))
     if (!(bo instanceof ast.Boolean)) {
         console.error(`Expression is not Boolean. Got ${bo}`);
         return false;
@@ -223,9 +323,39 @@ function testIdentifier(ident, value) {
     return true;
 }
 
-// Add other test functions as needed...
+function testInfixExpression(exp, left, operator, right) {
+    const onExp = exp;
+    if (!(onExp instanceof ast.InfixExpression)) {
+        console.error(`exp is not ast.InfixExpression. Got ${typeof onExp}(${onExp})`);
+        return false;
+    }
+
+    if (!testLiteralExpression(onExp.Token.Left, left)) {
+        return false;
+    }
+
+    if (onExp.Token.Operator !== operator) {
+        console.error(`exp.Token.Operator is not '${operator}'. Got ${onExp.Token.Operator}`);
+        return false;
+    }
+
+    if (!testLiteralExpression(onExp.Right, right)) {
+        return false;
+    }
+
+    return true;
+}
+
+
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+// ==============================================================================
+
 
 // Run the test functions
 // testReturnStatements();
 // testLoopExpression();
-testFloatLiteralExpression();
+// testFloatLiteralExpression();
+// testIfElseExpression();
+testOperatorPrecedenceParsing();

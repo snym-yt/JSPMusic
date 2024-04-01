@@ -37,16 +37,16 @@ class Parser {
         this.prefixParseFns = {};
         this.registerPrefix(`IDENT`, this.parseIdentifier);
         this.registerPrefix(`INT`, this.parseIntegerLiteral);
-        this.registerPrefix(`!`, this.parsePrefixExpression);
-        this.registerPrefix(`-`, this.parsePrefixExpression);
+        this.registerPrefix(`BANG`, this.parsePrefixExpression);
+        this.registerPrefix(`MINUS`, this.parsePrefixExpression);
         this.registerPrefix(`TRUE`, this.parseBoolean);
         this.registerPrefix(`FALSE`, this.parseBoolean);
-        this.registerPrefix(`(`, this.parseGroupedExpression);
+        this.registerPrefix(`LPAREN`, this.parseGroupedExpression);
         this.registerPrefix(`IF`, this.parseIfExpression);
         this.registerPrefix(`FUNCTION`, this.parseFunctionLiteral);
         this.registerPrefix(`STRING`, this.parseStringLiteral);
-        this.registerPrefix(`[`, this.parseArrayLiteral);
-        this.registerPrefix(`{`, this.parseHashLiteral);
+        this.registerPrefix(`LBRACKET`, this.parseArrayLiteral);
+        this.registerPrefix(`LBRACE`, this.parseHashLiteral);
         this.registerPrefix(`while`, this.parseWhileExpression);
         this.registerPrefix(`FLOAT`, this.parseFloatLiteral);
         this.registerPrefix(`LOOP`, this.parseLoopExpression);
@@ -91,9 +91,7 @@ class Parser {
         
         while (this.curToken.type != "EOF") {
             // console.log("in while of parseProgram()");
-            console.log(this.curToken.type);
             const stmt = this.parseStatement();
-            // console.log("stmt:" + stmt);
             console.log("stmt:" + JSON.stringify(stmt, null, 2))
             if (stmt !== null) {
                 program.Statements.push(stmt);
@@ -137,10 +135,9 @@ class Parser {
 
     parseReturnStatement() {
         const stmt = new ast.ReturnStatement({ Token: this.curToken });
-        console.log("in praseReturnStatement before nextToken(), now curToken.type is " + this.curToken.type)
+        console.log("in praseReturnStatement before nextToken(), curToken.type is " + this.curToken.type)
         this.nextToken();
-        console.log("in praseReturnStatement after nextToken(), now curToken.type is " + this.curToken.type)
-        console.log("in praseReturnStatement after nextToken(), now peekToken.type is " + this.peekToken.type)
+        console.log("in praseReturnStatement after nextToken(), curToken.type is " + this.curToken.type + ",  peekToken.type is " + this.peekToken.type)
         stmt.ReturnValue = this.parseExpression(LOWEST);
         console.log("in praseReturnStatement after nextToken(), now peekToken.type is " + this.peekToken.type)
         while (!this.peekTokenIs("SEMICOLON")) {
@@ -152,7 +149,7 @@ class Parser {
     }
 
     parseExpressionStatement() {
-        console.log("start praseReturnStatement, curToken.type is " + this.curToken.type)
+        console.log("start praseExpressionStatement, curToken.type is " + this.curToken.type)
         const stmt = new ast.ExpressionStatement({ Token: this.curToken });
         stmt.Expression = this.parseExpression(LOWEST);
         if (this.peekTokenIs(`SEMICOLON`)) {
@@ -175,6 +172,7 @@ class Parser {
         while (!this.peekTokenIs(`;`) && precedence < this.peekPrecedence()) {
             console.log("[while in parseExpression]");
             const infix = this.infixParseFns[this.peekToken.type];
+            console.log(infix);
             if (!infix) {
                 console.log("!infix");
                 return leftExp;
@@ -182,7 +180,7 @@ class Parser {
             this.nextToken();
             leftExp = infix.bind(this)(leftExp);
         }
-        console.log("in parseExpression, next return leftExp;")
+        // console.log("in parseExpression, next return leftExp;")
         return leftExp;
     }
 
@@ -298,7 +296,7 @@ class Parser {
             return null;
         }
         expression.Consequence = this.parseBlockStatement();
-        if (this.peekTokenIs(`FALSE`)) {
+        if (this.peekTokenIs(`ELSE`)) {
             this.nextToken();
             if (!this.expectPeek(`LBRACE`)) {
                 return null;
