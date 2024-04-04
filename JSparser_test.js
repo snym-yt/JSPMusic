@@ -242,6 +242,42 @@ function testOperatorPrecedenceParsing() {
     console.log("testOpratorPrecedenceParsing passed successfully.");
 }
 
+function testCallExpressionParsing() {
+    const input = "add(1, 2*3, 4+5);";
+    const l = newLexer(input);
+    const p = newParser(l);
+    const program = p.parseProgram();
+    checkParserErrors(p);
+    if (program.Statements.length !== 1) {
+        console.error(`program.Statements does not contain 1 statements. Got ${program.Statements.length}`);
+        return;
+    }
+    const stmt = program.Statements[0];
+    if (!(stmt instanceof ast.ExpressionStatement)) {
+        console.error(`stmt is not ast.ExpressionStatement. Got ${typeof program.Statements[0]}`);
+        return;
+    }
+    const exp = stmt.Expression;
+    if (!(exp instanceof ast.CallExpression)) {
+        console.error(`stmt.Expression is not ast.CallExpression. Got ${typeof stmt.Expression}`);
+        return;
+    }
+    if (!testIdentifier(exp.Token.Function, "add")) {
+        return;
+    }
+    if (exp.Arguments.length !== 3) {
+        console.error(`wrong length of arguments. Got ${exp.Arguments.length}`);
+        return;
+    }
+    testLiteralExpression(exp.Arguments[0], 1);
+    testInfixExpression(exp.Arguments[1], 2, "*", 3);
+    testInfixExpression(exp.Arguments[2], 4, "+", 5);
+
+    console.log("testCallExpressionParsing passed successfully.");
+
+}
+
+
 
 
 
@@ -358,4 +394,5 @@ function testInfixExpression(exp, left, operator, right) {
 // testLoopExpression();
 // testFloatLiteralExpression();
 // testIfElseExpression();
-testOperatorPrecedenceParsing();
+// testOperatorPrecedenceParsing();
+testCallExpressionParsing();

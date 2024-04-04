@@ -92,7 +92,7 @@ class Parser {
         while (this.curToken.type != "EOF") {
             // console.log("in while of parseProgram()");
             const stmt = this.parseStatement();
-            console.log("stmt:" + JSON.stringify(stmt, null, 2))
+            console.log("stmt:" + JSON.stringify(stmt, null, 4))
             if (stmt !== null) {
                 program.Statements.push(stmt);
                 // console.log("in parseProgram, now program.Statements: " + JSON.stringify(program.Statements, null, 2));
@@ -166,10 +166,10 @@ class Parser {
             return null;
         }
         let leftExp = prefix.bind(this)();
-        console.log("in parseExpression, this.peekTokenIs(`;`) is " + this.peekTokenIs(`;`) + ",  this.peekToken.type is " + this.peekToken.type);
+        console.log("in parseExpression, this.peekTokenIs(`SEMICOLON`) is " + this.peekTokenIs(`SEMICOLON`) + ",  this.peekToken.type is " + this.peekToken.type);
         console.log("in parseExpression, precedence is " + precedence + "   this.peekPrecedence() is " + this.peekPrecedence());
 
-        while (!this.peekTokenIs(`;`) && precedence < this.peekPrecedence()) {
+        while (!this.peekTokenIs(`SEMICOLON`) && precedence < this.peekPrecedence()) {
             console.log("[while in parseExpression]");
             const infix = this.infixParseFns[this.peekToken.type];
             console.log(infix);
@@ -342,7 +342,7 @@ class Parser {
         this.nextToken();
         const ident = new ast.Identifier({ Token: this.curToken, Value: this.curToken.literal });
         identifiers.push(ident);
-        while (this.peekTokenIs(`,`)) {
+        while (this.peekTokenIs(`COMMA`)) {
             this.nextToken();
             this.nextToken();
             const ident = new ast.Identifier({ Token: this.curToken, Value: this.curToken.literal });
@@ -356,7 +356,7 @@ class Parser {
 
     parseCallExpression(func) {
         const exp = new ast.CallExpression({ Token: this.curToken, Function: func });
-        exp.Arguments = this.parseExpressionList(`)`);
+        exp.Arguments = this.parseExpressionList(`RPAREN`);
         return exp;
     }
 
@@ -378,7 +378,8 @@ class Parser {
         }
         this.nextToken();
         list.push(this.parseExpression(LOWEST));
-        while (this.peekTokenIs(`,`)) {
+        while (this.peekTokenIs(`COMMA`)) {
+            console.log("---------------------------------------------------")
             this.nextToken();
             this.nextToken();
             list.push(this.parseExpression(LOWEST));
@@ -402,7 +403,7 @@ class Parser {
     parseHashLiteral() {
         const hash = new ast.HashLiteral({ Token: this.curToken });
         hash.Pairs = new Map();
-        while (!this.peekTokenIs(`}`)) {
+        while (!this.peekTokenIs(`RBRACE`)) {
             this.nextToken();
             const key = this.parseExpression(LOWEST);
             if (!this.expectPeek(`COLON`)) {
@@ -411,7 +412,7 @@ class Parser {
             this.nextToken();
             const value = this.parseExpression(LOWEST);
             hash.Pairs.set(key, value);
-            if (!this.peekTokenIs(`}`) && !this.expectPeek(`,`)) {
+            if (!this.peekTokenIs(`RBRACE`) && !this.expectPeek(`,`)) {
                 return null;
             }
         }
