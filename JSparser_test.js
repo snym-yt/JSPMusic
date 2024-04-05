@@ -115,6 +115,61 @@ function testLoopExpression() {
     }
 }
 
+function testWhileExpression() {
+    const tests = [
+        `while(true) {\
+             play(60, 0.5);\
+        }`,
+    ];
+
+    for (const test of tests) {
+        const l = newLexer(test);
+        const p = newParser(l);
+        const program = p.parseProgram();
+        checkParserErrors(p);
+
+        if (program.Statements.length !== 1) {
+            console.error(`Program statements do not contain 1 statement. Got ${program.Statements.length}`);
+            continue;
+        }
+
+        const stmt = program.Statements[0];
+        if (!(stmt instanceof ast.ExpressionStatement)) {
+            console.error(`Statement is not ExpressionStatement. Got ${stmt}`);
+            continue;
+        }
+
+        // parser のstmtと同じのが入っている
+        // console.log("in testReturnStatements() stmt:" + JSON.stringify(stmt, null, 2))
+
+        const exp = stmt.Expression;
+        console.log("exp.TokenLiteral() is " + exp.TokenLiteral());
+        if (!(exp instanceof ast.WhileExpression)) {
+            console.error(`stmt.Expression is not ast.WhileExpression. Got ${exp.TokenLiteral()}`);
+            continue;
+        }
+
+        if (!(testBooleanLiteral(exp.Condition, true))){
+            console.error(`exp.Condition is Error.`);
+            continue;
+        }
+
+        if (exp.Consequence.Statements.length != 1){
+            console.error(`Consequence is not 1 statements. Got ${exp.Consequence.Statements.length}`)
+        }
+
+        const consequence = exp.Consequence.Statements[0]
+        if (!(consequence instanceof ast.ExpressionStatement)) {
+            console.error(`consequence is not ast.ReturnStatement. Got ${consequence.TokenLiteral()}`);
+            continue;
+        }
+
+    }
+
+    console.log("testWhileExpression passed successfully.");
+
+}
+
 
 function testFloatLiteralExpression() {
     const input = "1.2;";
@@ -454,5 +509,6 @@ function testInfixExpression(exp, left, operator, right) {
 // testFloatLiteralExpression();
 // testIfElseExpression();
 // testOperatorPrecedenceParsing();
-testCallExpressionParsing();
+// testCallExpressionParsing();
 // testFloatLiteralExpression();
+testWhileExpression();

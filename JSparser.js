@@ -424,15 +424,15 @@ class Parser {
 
     parseWhileExpression() {
         const expression = new ast.WhileExpression({ Token: this.curToken });
-        if (!this.expectPeek(`(`)) {
+        if (!this.expectPeek(`LPAREN`)) {
             return null;
         }
         this.nextToken();
         expression.Condition = this.parseExpression(LOWEST);
-        if (!this.expectPeek(`)`)) {
+        if (!this.expectPeek(`RPAREN`)) {
             return null;
         }
-        if (!this.expectPeek(`{`)) {
+        if (!this.expectPeek(`LBRACE`)) {
             return null;
         }
         expression.Consequence = this.parseBlockStatement();
