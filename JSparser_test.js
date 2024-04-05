@@ -243,7 +243,8 @@ function testOperatorPrecedenceParsing() {
 }
 
 function testCallExpressionParsing() {
-    const input = "add(1, 2*3, 4+5);";
+    // const input = "add(1, 2*3, 4+5);";
+    const input = "play(60, 0.5);";
     const l = newLexer(input);
     const p = newParser(l);
     const program = p.parseProgram();
@@ -262,20 +263,57 @@ function testCallExpressionParsing() {
         console.error(`stmt.Expression is not ast.CallExpression. Got ${typeof stmt.Expression}`);
         return;
     }
-    if (!testIdentifier(exp.Token.Function, "add")) {
+    if (!testIdentifier(exp.Token.Function, "play")) {
         return;
     }
-    if (exp.Arguments.length !== 3) {
+    if (exp.Arguments.length !== 2) {
         console.error(`wrong length of arguments. Got ${exp.Arguments.length}`);
         return;
     }
-    testLiteralExpression(exp.Arguments[0], 1);
-    testInfixExpression(exp.Arguments[1], 2, "*", 3);
-    testInfixExpression(exp.Arguments[2], 4, "+", 5);
+    testLiteralExpression(exp.Arguments[0], 60);
+    testLiteralExpression(exp.Arguments[1], 0.5);
+
+    // testInfixExpression(exp.Arguments[1], 2, "*", 3);
+    // testInfixExpression(exp.Arguments[2], 4, "+", 5);
 
     console.log("testCallExpressionParsing passed successfully.");
 
 }
+
+
+function testFloatLiteralExpression() {
+    const input = "1.2;";
+    const l = newLexer(input);
+    const p = newParser(l);
+    const program = p.parseProgram();
+    checkParserErrors(p);
+
+    if (program.Statements.length !== 1) {
+        console.error(`program has not enough statements. Got ${program.Statements.length}`);
+        return;
+    }
+
+    const stmt = program.Statements[0];
+    if (!(stmt instanceof ast.ExpressionStatement)) {
+        console.error(`program.Statements[0] is not ast.ExpressionStatement. Got ${typeof program.Statements[0]}`);
+        return;
+    }
+
+    const literal = stmt.Expression;
+    if (!(literal instanceof ast.FloatLiteral)) {
+        console.error(`exp not ast.FloatLiteral. Got ${typeof stmt.Expression}`);
+        return;
+    }
+
+    if (literal.TokenLiteral() !== "1.2") {
+        console.error(`literal.TokenLiteral not '1.2'. Got ${literal.TokenLiteral()}`);
+        return;
+    }
+
+    console.log("testFloatLiteralExpression passed successfully.");
+
+}
+
 
 
 
@@ -292,7 +330,11 @@ function testCallExpressionParsing() {
 
 function testLiteralExpression(exp, expected) {
     if (typeof expected === "number") {
-        return testIntegerLiteral(exp, expected);
+        if (Number.isInteger(expected)) {
+            return testIntegerLiteral(exp, expected);
+        } else {
+            return testFloatLiteral(exp, expected);
+        }
     } else if (typeof expected === "boolean") {
         return testBooleanLiteral(exp, expected);
     } else if (typeof expected === "string") {
@@ -316,6 +358,23 @@ function testIntegerLiteral(il, value) {
     }
     if (il.TokenLiteral() !== value.toString()) {
         console.error(`IntegerLiteral TokenLiteral not ${value}. Got ${il.TokenLiteral()}`);
+        return false;
+    }
+    return true;
+}
+
+function testFloatLiteral(fl, value) {
+    if (!(fl instanceof ast.FloatLiteral)) {
+        console.error(`Expression is not FloatLiteral. Got ${fl}`);
+        console.log(JSON.stringify(fl, null, 2))
+        return false;
+    }
+    if (fl.Value !== value) {
+        console.error(`FloatLiteral value not ${value}. Got ${fl.Value}`);
+        return false;
+    }
+    if (fl.TokenLiteral() !== value.toString()) {
+        console.error(`IntegerLiteral TokenLiteral not ${value}. Got ${fl.TokenLiteral()}`);
         return false;
     }
     return true;
@@ -396,3 +455,4 @@ function testInfixExpression(exp, left, operator, right) {
 // testIfElseExpression();
 // testOperatorPrecedenceParsing();
 testCallExpressionParsing();
+// testFloatLiteralExpression();

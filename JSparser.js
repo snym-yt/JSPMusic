@@ -47,7 +47,7 @@ class Parser {
         this.registerPrefix(`STRING`, this.parseStringLiteral);
         this.registerPrefix(`LBRACKET`, this.parseArrayLiteral);
         this.registerPrefix(`LBRACE`, this.parseHashLiteral);
-        this.registerPrefix(`while`, this.parseWhileExpression);
+        this.registerPrefix(`WHILE`, this.parseWhileExpression);
         this.registerPrefix(`FLOAT`, this.parseFloatLiteral);
         this.registerPrefix(`LOOP`, this.parseLoopExpression);
 
