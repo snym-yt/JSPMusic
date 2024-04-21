@@ -115,6 +115,70 @@ function testLoopExpression() {
     }
 }
 
+function testLoopExpression2() {
+    const tests = [
+        `loop(10){\
+            play(60, 0.1);\
+            play(0, 0.0);\
+            play(0, 0.0);\
+        }`,
+    ];
+
+    for (const test of tests) {
+        const l = newLexer(test);
+        const p = newParser(l);
+        const program = p.parseProgram();
+        checkParserErrors(p);
+
+        if (program.Statements.length !== 1) {
+            console.error(`Program statements do not contain 1 statement. Got ${program.Statements.length}`);
+            continue;
+        }
+
+        const stmt = program.Statements[0];
+        if (!(stmt instanceof ast.ExpressionStatement)) {
+            console.error(`Statement is not ExpressionStatement. Got ${stmt}`);
+            continue;
+        }
+
+        const exp = stmt.Expression;
+        // console.log("exp.TokenLiteral() is " + exp.TokenLiteral());
+        if (!(exp instanceof ast.LoopExpression)) {
+            console.error(`stmt.Expression is not LoopExpression. Got ${exp.TokenLiteral()}`);
+            continue;
+        }
+
+        if (!(testIntegerLiteral(exp.Condition, 10))){
+            console.error(`exp.Condition is Error.`);
+            continue;
+        }
+
+        if (exp.Consequence.Statements.length != 3){
+            console.error(`Consequence is not 3 statements. Got ${length(exp.Consequence.Statements)}`)
+        }
+
+        let consequence = exp.Consequence.Statements[0]
+        if (!(consequence instanceof ast.ExpressionStatement)) {
+            console.error(`first consequence is not ExpressionStatement. Got ${consequence.TokenLiteral()}`);
+            continue;
+        }
+
+        consequence = exp.Consequence.Statements[1]
+        if (!(consequence instanceof ast.ExpressionStatement)) {
+            console.error(`second consequence is not ExpressionStatement. Got ${consequence.TokenLiteral()}`);
+            continue;
+        }
+
+        consequence = exp.Consequence.Statements[2]
+        if (!(consequence instanceof ast.ExpressionStatement)) {
+            console.error(`third consequence is not ExpressionStatement. Got ${consequence.TokenLiteral()}`);
+            continue;
+        }
+    }
+
+    console.log("testWhileExpression2 passed successfully.");
+}
+
 function testWhileExpression() {
     const tests = [
         `while(true) {\
@@ -511,4 +575,5 @@ function testInfixExpression(exp, left, operator, right) {
 // testOperatorPrecedenceParsing();
 // testCallExpressionParsing();
 // testFloatLiteralExpression();
-testWhileExpression();
+// testWhileExpression();
+testLoopExpression2();
